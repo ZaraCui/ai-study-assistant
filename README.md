@@ -20,6 +20,7 @@ Perfect for exam preparation and personalized studying.
 
 ---
 
+
 ## Features
 
 - Load local notes (.pdf, .md, .txt)
@@ -29,10 +30,10 @@ Perfect for exam preparation and personalized studying.
 - FAISS vector search for similarity lookup
 - Full RAG pipeline with **token safety checks**
 - **Comprehensive logging** for debugging
-- **Configurable via environment variables** (NOTES_DIR, INDEX_PATH)
-- FastAPI endpoint `/ask?q=...`
+- **Configurable via environment variables** (NOTES_DIR, INDEX_PATH, DEFAULT_COURSE)
+- **Multi-course support** — manage and query multiple courses independently
+- FastAPI endpoints: `/ask?q=...&course=COURSE_CODE`, `/courses`, `/courses/{course_code}`
 - Persistent index storage (auto-load on startup)
-
 ---
 
 ## Repository Layout
@@ -123,6 +124,9 @@ http://127.0.0.1:8000/ask?q=your+question
 | `NOTES_DIR` | `data/notes/COMP2123` | Path to folder containing your notes |
 | `INDEX_PATH` | `data/index/comp2123` | Path prefix for persisted FAISS index |
 | `OPENAI_API_KEY` | (required) | Your OpenAI API key |
+| `DEFAULT_COURSE` | `COMP2123` | Default course to use when not specified |
+| `NOTES_BASE_DIR` | `data/notes` | Base folder for all course notes |
+| `INDEX_BASE_DIR` | `data/index` | Base folder for all course indexes |
 
 ---
 
@@ -135,6 +139,10 @@ PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build
 ```
 
 Options:
+`--course <code>` — course code like 'COMP2123' (default: value of DEFAULT_COURSE env var)
+`--notes <path>` — notes folder (default: data/notes/<course>)
+`--index-path <path>` — index path prefix (default: data/index/<course>)
+`--force` — delete existing files before rebuilding
 - `--notes <path>` — notes folder (default: data/notes/COMP2123)
 - `--index-path <path>` — index path prefix (default: data/index/comp2123)
 - `--force` — delete existing files before rebuilding
@@ -161,6 +169,23 @@ PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py status
 
 🛡️ **Token Safety**: Automatic detection and truncation of large prompts to prevent API errors.
 
+## Recent Improvements (v0.3)
+
+✨ **Multi-Course Support**: Manage and query multiple courses independently with separate indexes.
+
+📚 **Course Management**: New `/courses` API endpoints to list and inspect available courses.
+
+🛠️ **Enhanced CLI**: Improved `manage_index.py` with course-aware commands and better status reporting.
+
+💾 **Smart Caching**: Lazy-load course indexes on first query, automatic in-memory caching.
+
+## Previous Improvements (v0.2)
+
+✨ **Environment Variable Configuration**: Set `NOTES_DIR` and `INDEX_PATH` without editing code.
+
+📊 **Comprehensive Logging**: Detailed INFO/DEBUG/ERROR logs at every step for troubleshooting.
+
+🛡️ **Token Safety**: Automatic detection and truncation of large prompts to prevent API errors.
 ---
 
 ## Architecture
