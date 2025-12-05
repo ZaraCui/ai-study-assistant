@@ -7,30 +7,40 @@ from rag.prompt import build_prompt
 from rag.loader import load_texts
 from rag.chunker import chunk_text
 
-# TODO: do NOT hard-code key in real projects.
-# Read from environment variable instead.
+# Read OpenAI key from environment (no hardcoding)
 openai.api_key = os.getenv("OPENAI_API_KEY", "YOUR_API_KEY_HERE")
 
 # Global in-memory vector store
 store = None  # will be initialized after building knowledge base
 
+# Default path prefix for persisted index/texts
+DEFAULT_INDEX_PATH = "data/index/comp2123"
 
-def build_knowledge_base_from_dir(folder_path: str):
+
+def build_knowledge_base_from_dir(folder_path: str, index_path: str = DEFAULT_INDEX_PATH):
     """
-    Build the vector store from all notes under folder_path.
-    This will:
-      1) load raw texts (PDF/txt/md)
-      2) chunk them
-      3) embed all chunks
-      4) populate the global vector store
+    Build or load the vector store from notes under folder_path.
+
+    Behavior:
+      - If a persisted index exists at `index_path`, load it and set global `store`.
+      - Otherwise, load raw texts, chunk, embed, build an in-memory VectorStore,
+        save it to `index_path`, and set global `store`.
     """
     global store
+
+    # Try to load existing persisted index first
+    try:
+        vs = VectorStore.load(index_path)
+        store = vs
+        return
+    except FileNotFoundError:
+        # no persisted index found; continue to build
+        pass
 
     raw_texts = load_texts(folder_path)
     all_chunks = []
 
     for text in raw_texts:
-        # use your existing chunk_text function
         chunks = chunk_text(text)
         all_chunks.extend(chunks)
 
@@ -42,6 +52,14 @@ def build_knowledge_base_from_dir(folder_path: str):
 
     vs = VectorStore(dim)
     vs.add(vectors, all_chunks)
+
+    # Save the built index for future runs
+    try:
+        vs.save(index_path)
+    except Exception as e:
+        # do not fail the whole flow if saving fails; log instead
+        print(f"Warning: failed to save vector index: {e}")
+
     store = vs
 
 
@@ -54,7 +72,6 @@ def answer_question(question: str) -> str:
       4) ask OpenAI
     """
     if store is None:
-        # You forgot to call build_knowledge_base_from_dir somewhere (e.g. startup)
         return "Knowledge base is not initialized."
 
     q_vec = model.encode([question])[0]
