@@ -49,96 +49,149 @@ source venv/bin/activate      # Windows: venv\Scripts\activate
 2️⃣ Install dependencies
 pip install -r requirements.txt
 
-3️⃣ Add your notes
+```markdown
+## 🧠 AI Study Assistant
 
-Place .txt or .md files inside:
+A lightweight, personalized AI study assistant that uses your own course materials to answer questions via Retrieval-Augmented Generation (RAG).
 
+## 🚀 Project Goal
+
+This project is designed to provide precise answers grounded in your lecture notes, slides, and other study documents. It helps consolidate knowledge, prepare for exams, and create personalized explanations.
+
+## ✨ Key Features
+
+- Load notes from local files (`.txt`, `.md`, and `.pdf`)
+- Chunk documents into semantic passages
+- Generate sentence embeddings using `sentence-transformers`
+- Perform similarity search with FAISS
+- Build prompts from retrieved passages and query an LLM for grounded answers
+- Expose a simple FastAPI endpoint `/ask?q=...` for querying
+
+## 📁 Project Structure
+
+ai-study-assistant/
+│ app.py
+│ config.py
+│ requirements.txt
+│
+├── data/
+│   └── notes/            # Put your course notes here
+│
+├── rag/
+│   ├── loader.py         # Load and clean text/pdf files
+│   ├── chunker.py        # Split text into chunks
+│   ├── embedder.py       # Embedding model wrapper
+│   ├── vectorstore.py    # FAISS index and search wrapper
+│   ├── prompt.py         # Prompt template builder
+│   └── qa.py             # RAG pipeline: build index and answer questions
+│
+└── api/
+    └── ask.py            # FastAPI route for `/ask`
+
+## 🧪 Quick Start
+
+1) Create a virtual environment
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+2) Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+3) Add your notes
+
+Place `.txt`, `.md`, or `.pdf` files under:
+
+```
 data/notes/
+```
 
-4️⃣ Run the API
-uvicorn app:app --reload
-
-
-Then open:
-
-http://127.0.0.1:8000/ask?q=what+is+polymorphism
-
-## 🧰 Index management CLI
-
-脚本 `scripts/manage_index.py` 提供了简单的索引管理工具：
-
-- `build` — 从笔记目录构建并保存 FAISS 索引（默认 `data/notes/COMP2123`）：
+4) (Optional) Build the index manually
 
 ```bash
 PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build
 ```
 
-可选参数：
-- `--index-path`：索引保存前缀（默认 `data/index/comp2123`）
-- `--force`：删除已有索引文件后重建
+5) Run the API
 
-- `load` — 加载并显示索引统计信息：
+```bash
+uvicorn app:app --reload
+```
+
+Open the ask endpoint in your browser or via curl:
+
+```
+http://127.0.0.1:8000/ask?q=what+is+polymorphism
+```
+
+## 🧠 Example Use Cases
+
+- Generate clear explanations for complex topics
+- Review course materials
+- Create exam summaries and practice questions
+- Build a personal study tutor
+
+## 🛣️ Roadmap
+
+**Phase 1 — MVP (current)**
+
+- Basic RAG pipeline
+- Simple web API
+
+**Phase 2 — Advanced RAG**
+
+- Better PDF handling and text extraction
+- Smarter chunking strategies
+- Multi-course indexing and metadata support
+
+**Phase 3 — Frontend UI**
+
+- Web dashboard and chat-like interface
+
+**Phase 4 — Smart Extensions**
+
+- Auto-generate quizzes and summaries
+- Learning schedule suggestions and memory-based personalization
+
+## 🧰 Index Management CLI
+
+The repository includes a small CLI to manage the FAISS index: `scripts/manage_index.py`.
+
+- Build an index from your notes (default path: `data/notes/COMP2123`):
+
+```bash
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build
+```
+
+Optional flags:
+- `--index-path` — path prefix for saved index files (default `data/index/comp2123`)
+- `--force` — remove existing index files before building
+
+- Load an existing index and print basic stats:
 
 ```bash
 PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py load
 ```
 
-- `status` — 检查索引文件是否存在：
+- Check whether index files exist:
 
 ```bash
 PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py status
 ```
 
-注意：构建索引时会调用 `sentence-transformers` 模型（`all-MiniLM-L6-v2`）下载权重，首次运行可能较慢并需要网络。
-
-
-## 🧠 Example Use Cases
-
-Generate explanations for complex concepts
-
-Review course material
-
-Prepare exam summaries
-
-Create personalized practice questions
-
-Build your own AI tutor
-
-## 🛣️ Roadmap (Planned Features)
-🔹 Phase 1 — MVP (current)
-
-Basic RAG pipeline
-
-Simple web API
-
-🔹 Phase 2 — Advanced RAG
-
-PDF → text support
-
-Better chunking strategies
-
-Multiple course indexing
-
-🔹 Phase 3 — Frontend UI
-
-Web dashboard
-
-Chat-like interface
-
-🔹 Phase 4 — Smart Extensions
-
-Auto-generate quizzes
-
-Auto-summarize notes
-
-Study schedule suggestions
-
-Memory-based personalized learning
+Note: Building the index downloads the `all-MiniLM-L6-v2` sentence-transformers model the first time and may take a few minutes.
 
 ## 🤝 Contributing
 
-Currently a personal learning project, but PRs and suggestions are welcome.
+This is a personal project but contributions and suggestions are welcome.
 
 ## 📄 License
 
 MIT License
+
+``` 
