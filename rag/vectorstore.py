@@ -35,7 +35,9 @@ class VectorStore:
         query_vector = np.array([query_vector]).astype("float32")
         _, indices = self.index.search(query_vector, top_k)
         # protect against missing texts (shouldn't normally happen)
-        return [self.texts[i] for i in indices[0] if i is not None and i < len(self.texts)]
+        return [
+            self.texts[i] for i in indices[0] if i is not None and i < len(self.texts)
+        ]
 
     def save(self, path_prefix: str):
         """Save FAISS index and texts using the provided path prefix.

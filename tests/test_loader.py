@@ -1,4 +1,3 @@
-import os
 from rag.loader import load_texts
 
 

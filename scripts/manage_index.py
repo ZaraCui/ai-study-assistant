@@ -44,11 +44,11 @@ def cmd_build(args):
     course_code = args.course or DEFAULT_COURSE
     notes = args.notes or get_course_notes_path(course_code)
     index_path = args.index_path or get_course_index_path(course_code)
-    
+
     if not os.path.exists(notes):
         print(f"Error: Notes folder not found: {notes}")
         sys.exit(1)
-    
+
     if args.force:
         removed = remove_index_files(index_path)
         if removed:
@@ -57,7 +57,7 @@ def cmd_build(args):
     print(f"Building index for course: {course_code}")
     print(f"  Notes folder: {notes}")
     print(f"  Index path: {index_path}")
-    
+
     try:
         build_knowledge_base_from_dir(notes, index_path, course_code)
         print(f"✓ Build completed. Index saved at: {index_path}")
@@ -69,7 +69,7 @@ def cmd_build(args):
 def cmd_load(args):
     course_code = args.course or DEFAULT_COURSE
     index_path = args.index_path or get_course_index_path(course_code)
-    
+
     try:
         vs = VectorStore.load(index_path)
         try:
@@ -92,16 +92,15 @@ def cmd_load(args):
 
 def cmd_status(args):
     course_code = args.course or DEFAULT_COURSE
-    index_path = args.index_path or get_course_index_path(course_code)
-    
+
     info = get_course_info(course_code)
     print(f"Course: {course_code}")
     print(f"  Indexed: {'Yes' if info['indexed'] else 'No'}")
     print(f"  Loaded: {'Yes' if info['loaded'] else 'No'}")
-    if info['loaded']:
+    if info["loaded"]:
         print(f"  Chunks: {info['chunk_count']}")
     print(f"  Notes exist: {'Yes' if info['notes_exist'] else 'No'}")
-    if info['notes_exist']:
+    if info["notes_exist"]:
         print(f"  Notes path: {info['notes_path']}")
 
 
@@ -118,23 +117,41 @@ def cmd_list(args):
 
 
 def build_parser():
-    p = argparse.ArgumentParser(description="Manage FAISS indexes for AI Study Assistant")
+    p = argparse.ArgumentParser(
+        description="Manage FAISS indexes for AI Study Assistant"
+    )
     sub = p.add_subparsers(dest="cmd")
 
     b = sub.add_parser("build", help="Build or rebuild the index from notes folder")
-    b.add_argument("--course", default=None, help=f"Course code (default: {DEFAULT_COURSE})")
-    b.add_argument("--notes", default=None, help="Folder with notes (default: data/notes/<course>)")
-    b.add_argument("--index-path", default=None, help="Path prefix for index files (default: data/index/<course>)")
-    b.add_argument("--force", action="store_true", help="Remove existing index files before building")
+    b.add_argument(
+        "--course", default=None, help=f"Course code (default: {DEFAULT_COURSE})"
+    )
+    b.add_argument(
+        "--notes", default=None, help="Folder with notes (default: data/notes/<course>)"
+    )
+    b.add_argument(
+        "--index-path",
+        default=None,
+        help="Path prefix for index files (default: data/index/<course>)",
+    )
+    b.add_argument(
+        "--force",
+        action="store_true",
+        help="Remove existing index files before building",
+    )
     b.set_defaults(func=cmd_build)
 
-    l = sub.add_parser("load", help="Attempt to load existing index and print stats")
-    l.add_argument("--course", default=None, help=f"Course code (default: {DEFAULT_COURSE})")
-    l.add_argument("--index-path", default=None, help="Path prefix for index files")
-    l.set_defaults(func=cmd_load)
+    load = sub.add_parser("load", help="Attempt to load existing index and print stats")
+    load.add_argument(
+        "--course", default=None, help=f"Course code (default: {DEFAULT_COURSE})"
+    )
+    load.add_argument("--index-path", default=None, help="Path prefix for index files")
+    load.set_defaults(func=cmd_load)
 
     s = sub.add_parser("status", help="Check if index files exist")
-    s.add_argument("--course", default=None, help=f"Course code (default: {DEFAULT_COURSE})")
+    s.add_argument(
+        "--course", default=None, help=f"Course code (default: {DEFAULT_COURSE})"
+    )
     s.add_argument("--index-path", default=None, help="Path prefix for index files")
     s.set_defaults(func=cmd_status)
 

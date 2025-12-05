@@ -24,12 +24,16 @@ def test_build_and_query_integration(tmp_path, monkeypatch):
     import rag.qa as qa_module
 
     def fake_create(*args, **kwargs):
-        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="DUMMY ANSWER"))])
+        return SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content="DUMMY ANSWER"))]
+        )
 
     monkeypatch.setattr(qa_module.openai.chat.completions, "create", fake_create)
 
     # Build the knowledge base for this test course
-    build_knowledge_base_from_dir(str(notes_dir), index_path=index_path, course_code="TESTCOURSE")
+    build_knowledge_base_from_dir(
+        str(notes_dir), index_path=index_path, course_code="TESTCOURSE"
+    )
 
     # Query the course
     ans = answer_question("what is testing?", course_code="TESTCOURSE")

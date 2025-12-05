@@ -2,6 +2,7 @@ import os
 import re
 import fitz  # PyMuPDF
 
+
 def _clean_pdf_text(text: str) -> str:
     """
     Clean raw PDF text:
@@ -16,6 +17,7 @@ def _clean_pdf_text(text: str) -> str:
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
 
+
 def pdf_to_text(path: str) -> str:
     """
     Extract text from a PDF using PyMuPDF.
@@ -26,6 +28,7 @@ def pdf_to_text(path: str) -> str:
         pages.append(page.get_text("text"))
     raw = "\n\n".join(pages)
     return _clean_pdf_text(raw)
+
 
 def load_texts(folder_path: str):
     """

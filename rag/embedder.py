@@ -1,10 +1,10 @@
-from typing import Optional
-
 _model = None
 
 
 def get_model():
-    """Lazily load the sentence-transformers model to avoid heavy downloads at import time."""
+    """
+    Lazily load the sentence-transformers model to avoid downloads at import.
+    """
     global _model
     if _model is None:
         from sentence_transformers import SentenceTransformer
