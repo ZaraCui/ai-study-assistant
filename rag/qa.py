@@ -13,8 +13,8 @@ openai.api_key = os.getenv("OPENAI_API_KEY", "YOUR_API_KEY_HERE")
 # Global in-memory vector store
 store = None  # will be initialized after building knowledge base
 
-# Default path prefix for persisted index/texts
-DEFAULT_INDEX_PATH = "data/index/comp2123"
+# Default path prefix for persisted index/texts (can be overridden via INDEX_PATH env var)
+DEFAULT_INDEX_PATH = os.getenv("INDEX_PATH", "data/index/comp2123")
 
 
 def build_knowledge_base_from_dir(folder_path: str, index_path: str = DEFAULT_INDEX_PATH):
