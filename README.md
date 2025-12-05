@@ -1,32 +1,27 @@
-```markdown
-# 🧠 AI Study Assistant
+🧠 AI Study Assistant
 
 A personalized AI-powered study assistant that learns from your course notes and answers your questions using Retrieval-Augmented Generation (RAG).
 
----
+🚀 Why This Project?
 
-## 🚀 Why This Project?
-
-Unlike general chatbots, this tool answers **specifically based on your own lecture notes**, tutorials, and study materials.  
+Unlike general chatbots, this tool answers specifically based on your own lecture notes, tutorials, and study materials.
 Perfect for consolidating knowledge, preparing for exams, and generating personalized explanations.
 
----
+✨ Features (MVP)
 
-## ✨ Features (MVP)
+📘 Load your own course notes (TXT/MD)
 
-- 📘 Load your own course notes (TXT/MD)
-- ✂️ Automatically chunk text into semantic units
-- 🧩 Generate embeddings using `sentence-transformers`
-- 🔎 Search relevant chunks via FAISS similarity search
-- 💬 Ask any question and get an answer grounded in your notes
-- 🌐 FastAPI backend with a simple `/ask?q=...` endpoint
+✂️ Automatically chunk text into semantic units
 
----
+🧩 Generate embeddings using sentence-transformers
 
-## 📁 Project Structure
+🔎 Search relevant chunks via FAISS similarity search
 
-```
+💬 Ask any question and get an answer grounded in your notes
 
+🌐 FastAPI backend with a simple /ask?q=... endpoint
+
+📁 Project Structure
 ai-study-assistant/
 │ app.py
 │ config.py
@@ -44,96 +39,77 @@ ai-study-assistant/
 │   └── qa.py                  # Full RAG pipeline
 │
 └── api/
-└── ask.py                 # /ask endpoint using FastAPI
+    └── ask.py                 # /ask endpoint using FastAPI
 
-````
-
----
-
-## 🧪 Quick Start
-
-### 1️⃣ Create virtual environment
-
-```bash
+🧪 Quick Start
+1️⃣ Create virtual environment
 python3 -m venv venv
 source venv/bin/activate      # Windows: venv\Scripts\activate
-````
 
-### 2️⃣ Install dependencies
-
-```bash
+2️⃣ Install dependencies
 pip install -r requirements.txt
-```
 
-### 3️⃣ Add your notes
+3️⃣ Add your notes
 
-Place `.txt` or `.md` files inside:
+Place .txt or .md files inside:
 
-```
 data/notes/
-```
 
-### 4️⃣ Run the API
-
-```bash
+4️⃣ Run the API
 uvicorn app:app --reload
-```
+
 
 Then open:
 
-```
 http://127.0.0.1:8000/ask?q=what+is+polymorphism
-```
 
----
+🧠 Example Use Cases
 
-## 🧠 Example Use Cases
+Generate explanations for complex concepts
 
-* Generate explanations for complex concepts
-* Review course material
-* Prepare exam summaries
-* Create personalized practice questions
-* Build your own AI tutor
+Review course material
 
----
+Prepare exam summaries
 
-## 🛣️ Roadmap (Planned Features)
+Create personalized practice questions
 
-### 🔹 Phase 1 — MVP (current)
+Build your own AI tutor
 
-* Basic RAG pipeline
-* Simple web API
+🛣️ Roadmap (Planned Features)
+🔹 Phase 1 — MVP (current)
 
-### 🔹 Phase 2 — Advanced RAG
+Basic RAG pipeline
 
-* PDF → text support
-* Better chunking strategies
-* Multiple course indexing
+Simple web API
 
-### 🔹 Phase 3 — Frontend UI
+🔹 Phase 2 — Advanced RAG
 
-* Web dashboard
-* Chat-like interface
+PDF → text support
 
-### 🔹 Phase 4 — Smart Extensions
+Better chunking strategies
 
-* Auto-generate quizzes
-* Auto-summarize notes
-* Study schedule suggestions
-* Memory-based personalized learning
+Multiple course indexing
 
----
+🔹 Phase 3 — Frontend UI
 
-## 🤝 Contributing
+Web dashboard
+
+Chat-like interface
+
+🔹 Phase 4 — Smart Extensions
+
+Auto-generate quizzes
+
+Auto-summarize notes
+
+Study schedule suggestions
+
+Memory-based personalized learning
+
+🤝 Contributing
 
 Currently a personal learning project, but PRs and suggestions are welcome.
 
----
-
-## 📄 License
+📄 License
 
 MIT License
-
-```
-
----
