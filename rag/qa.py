@@ -7,6 +7,7 @@ from rag.vectorstore import VectorStore
 from rag.prompt import build_prompt
 from rag.loader import load_texts
 from rag.chunker import chunk_text
+from rag.token_manager import truncate_chunks_by_tokens, is_prompt_safe, estimate_tokens
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -110,8 +111,10 @@ def answer_question(question: str) -> str:
     Run RAG-style QA:
       1) embed question
       2) search similar chunks
-      3) build prompt
-      4) ask OpenAI
+      3) truncate chunks if necessary to fit token limit
+      4) build prompt
+      5) check token safety
+      6) ask OpenAI
     """
     if store is None:
         logger.error("Knowledge base is not initialized. Cannot answer question.")
@@ -125,12 +128,37 @@ def answer_question(question: str) -> str:
         context_chunks = store.search(q_vec, top_k=3)
         logger.info(f"Found {len(context_chunks)} relevant chunks.")
         
+        # Token safety: truncate chunks if they would exceed token limit
+        model_name = "gpt-4o-mini"
+        max_context_tokens = 120000  # Conservative limit (gpt-4o-mini has 128k)
+        safe_chunks = truncate_chunks_by_tokens(context_chunks, max_context_tokens)
+        
+        if len(safe_chunks) < len(context_chunks):
+            logger.warning(
+                f"Truncated context from {len(context_chunks)} chunks to {len(safe_chunks)} "
+                f"to fit within token limit."
+            )
+        
         logger.debug("Building prompt...")
-        prompt = build_prompt(question, context_chunks)
+        prompt = build_prompt(question, safe_chunks)
+        
+        # Check if prompt is safe before sending to API
+        is_safe, token_info = is_prompt_safe(prompt, model_name)
+        logger.info(
+            f"Prompt token estimate: {token_info['estimated_tokens']} / "
+            f"{token_info['available_tokens']} available tokens"
+        )
+        
+        if not is_safe:
+            logger.warning(
+                f"Prompt may exceed token limit. Attempting to truncate further..."
+            )
+            safe_chunks = truncate_chunks_by_tokens(safe_chunks, 15000)
+            prompt = build_prompt(question, safe_chunks)
         
         logger.info("Calling OpenAI API...")
         resp = openai.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model_name,
             messages=[{"role": "user", "content": prompt}]
         )
         answer = resp.choices[0].message.content
