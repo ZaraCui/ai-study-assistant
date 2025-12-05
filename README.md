@@ -63,6 +63,35 @@ Then open:
 
 http://127.0.0.1:8000/ask?q=what+is+polymorphism
 
+## 🧰 Index management CLI
+
+脚本 `scripts/manage_index.py` 提供了简单的索引管理工具：
+
+- `build` — 从笔记目录构建并保存 FAISS 索引（默认 `data/notes/COMP2123`）：
+
+```bash
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build
+```
+
+可选参数：
+- `--index-path`：索引保存前缀（默认 `data/index/comp2123`）
+- `--force`：删除已有索引文件后重建
+
+- `load` — 加载并显示索引统计信息：
+
+```bash
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py load
+```
+
+- `status` — 检查索引文件是否存在：
+
+```bash
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py status
+```
+
+注意：构建索引时会调用 `sentence-transformers` 模型（`all-MiniLM-L6-v2`）下载权重，首次运行可能较慢并需要网络。
+
+
 ## 🧠 Example Use Cases
 
 Generate explanations for complex concepts
