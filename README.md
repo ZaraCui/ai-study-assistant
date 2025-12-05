@@ -10,153 +10,126 @@ Perfect for consolidating knowledge, preparing for exams, and generating persona
 ## ✨ Features
 
 📘 Load your own course notes (TXT/MD)
-
-✂️ Automatically chunk text into semantic units
-
-🧩 Generate embeddings using sentence-transformers
-
-🔎 Search relevant chunks via FAISS similarity search
-
-💬 Ask any question and get an answer grounded in your notes
-
-🌐 FastAPI backend with a simple /ask?q=... endpoint
-
-## 📁 Project Structure
-ai-study-assistant/<br>
-│ app.py<br>
-│ config.py<br>
-│ requirements.txt<br>
-│<br>
-├── data/<br>
-│   └── notes/                 # Place your course notes here<br>
-│<br>
-├── rag/<br>
-│   ├── loader.py              # Load and clean text files<br>
-│   ├── chunker.py             # Split text into chunks<br>
-│   ├── embedder.py            # Embedding model wrapper<br>
-│   ├── vectorstore.py         # FAISS index + search<br>
-│   ├── prompt.py              # Prompt template for LLM<br>
-│   └── qa.py                  # Full RAG pipeline<br>
-│<br>
-└── api/<br>
-    └── ask.py                 # /ask endpoint using FastAPI<br>
-
-## 🧪 Quick Start
-1️⃣ Create virtual environment
-python3 -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
-
-2️⃣ Install dependencies
-pip install -r requirements.txt
-
 ```markdown
-## 🧠 AI Study Assistant
+# AI Study Assistant
 
-A lightweight, personalized AI study assistant that uses your own course materials to answer questions via Retrieval-Augmented Generation (RAG).
+A lightweight, personal study assistant that uses Retrieval-Augmented Generation (RAG) to answer questions using your own lecture notes and course materials.
 
-## 🚀 Project Goal
+## Overview
 
-This project is designed to provide precise answers grounded in your lecture notes, slides, and other study documents. It helps consolidate knowledge, prepare for exams, and create personalized explanations.
+This project extracts text from `.pdf`, `.md`, and `.txt` notes, splits content into chunks, converts chunks to embeddings with `sentence-transformers`, stores embeddings in a FAISS index, and answers user questions by combining retrieved passages with an LLM.
 
-## ✨ Key Features
+Key goals:
+- Provide answers grounded in your own materials (no hallucination from unrelated data)
+- Make it easy to index course notes and query them via a simple HTTP API
 
-- Load notes from local files (`.txt`, `.md`, and `.pdf`)
-- Chunk documents into semantic passages
-- Generate sentence embeddings using `sentence-transformers`
-- Perform similarity search with FAISS
-- Build prompts from retrieved passages and query an LLM for grounded answers
-- Expose a simple FastAPI endpoint `/ask?q=...` for querying
+## Features
 
-## 📁 Project Structure
+- Load notes from local files (`.pdf`, `.md`, `.txt`)
+- Text extraction and basic cleaning for PDFs
+- Chunking with overlap to preserve context
+- Embedding via `sentence-transformers` (`all-MiniLM-L6-v2`)
+- Similarity search using FAISS
+- Simple RAG pipeline that builds prompts from retrieved passages and queries an LLM
+- FastAPI endpoint at `/ask?q=...` for querying
 
+## Repository Layout
+
+```
 ai-study-assistant/
-│ app.py
-│ config.py
-│ requirements.txt
-│
-├── data/
-│   └── notes/            # Put your course notes here
-│
-├── rag/
-│   ├── loader.py         # Load and clean text/pdf files
-│   ├── chunker.py        # Split text into chunks
-│   ├── embedder.py       # Embedding model wrapper
-│   ├── vectorstore.py    # FAISS index and search wrapper
-│   ├── prompt.py         # Prompt template builder
-│   └── qa.py             # RAG pipeline: build index and answer questions
-│
-└── api/
-    └── ask.py            # FastAPI route for `/ask`
+├─ app.py                 # FastAPI app and startup logic
+├─ requirements.txt       # Python dependencies
+├─ data/                  # Place your notes here
+│  └─ notes/COMP2123/
+├─ rag/                   # RAG pipeline modules
+│  ├─ loader.py           # Load & clean files (pdf/text)
+│  ├─ chunker.py          # Split text into chunks
+│  ├─ embedder.py         # sentence-transformers wrapper
+│  ├─ vectorstore.py      # FAISS wrapper with persistence
+│  ├─ prompt.py           # Prompt template builder
+│  └─ qa.py               # Build/load index and answer questions
+└─ api/
+   └─ ask.py              # /ask endpoint
+```
 
-## 🧪 Quick Start
+## Quick Start
 
-1) Create a virtual environment
+1. Create a virtual environment and activate it:
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-2) Install dependencies
+2. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3) Add your notes
+3. Add notes:
 
-Place `.txt`, `.md`, or `.pdf` files under:
+Place `.pdf`, `.md`, or `.txt` files under `data/notes/COMP2123/` (or adjust paths accordingly).
 
-```
-data/notes/
-```
-
-4) (Optional) Build the index manually
+4. (Optional) Build the FAISS index manually:
 
 ```bash
 PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build
 ```
 
-5) Run the API
+5. Run the API:
 
 ```bash
 uvicorn app:app --reload
 ```
 
-Open the ask endpoint in your browser or via curl:
+Then query:
 
 ```
-http://127.0.0.1:8000/ask?q=what+is+polymorphism
+http://127.0.0.1:8000/ask?q=your+question
 ```
 
-## 🧠 Example Use Cases
+## Index Management CLI
 
-- Generate clear explanations for complex topics
-- Review course materials
-- Create exam summaries and practice questions
-- Build a personal study tutor
+`scripts/manage_index.py` supports:
 
-## 🛣️ Roadmap
+- `build` — build (or rebuild) the index from a notes folder
+- `load` — load an existing index and print basic stats
+- `status` — check if index files exist
 
-**Phase 1 — MVP (current)**
+Examples:
 
-- Basic RAG pipeline
-- Simple web API
+```bash
+# Build index (default notes path: data/notes/COMP2123)
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build
 
-**Phase 2 — Advanced RAG**
+# Force-rebuild (delete existing files first)
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build --force
 
-- Better PDF handling and text extraction
-- Smarter chunking strategies
-- Multi-course indexing and metadata support
+# Load and inspect
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py load
 
-**Phase 3 — Frontend UI**
+# Check index file existence
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py status
+```
 
-- Web dashboard and chat-like interface
+Note: The first build downloads the `all-MiniLM-L6-v2` model and may take time.
 
-**Phase 4 — Smart Extensions**
+## Security & Notes
 
-- Auto-generate quizzes and summaries
-- Learning schedule suggestions and memory-based personalization
+- Set your OpenAI API key via environment variable: `export OPENAI_API_KEY="sk-..."`.
+- Do not commit secrets into the repository.
+- The FAISS index is persisted to `data/index/` by default; large files (e.g. `venv/`) are excluded via `.gitignore`.
+
+## Contributing
+
+Contributions are welcome — open an issue or PR for improvements.
+
+## License
+
+MIT License
+
+```
 
 ## 🧰 Index Management CLI
 
@@ -193,5 +166,3 @@ This is a personal project but contributions and suggestions are welcome.
 ## 📄 License
 
 MIT License
-
-``` 
