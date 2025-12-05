@@ -14,6 +14,7 @@ Most chatbots answer using generic internet knowledge. This assistant answers us
 - Storing embeddings in a FAISS index
 - Retrieving relevant chunks when you ask a question
 - Using an LLM to answer based on retrieved context
+- **Safe token handling** to prevent API overflow errors
 
 Perfect for exam preparation and personalized studying.
 
@@ -26,8 +27,11 @@ Perfect for exam preparation and personalized studying.
 - Chunk text with overlap
 - Generate embeddings with all-MiniLM-L6-v2
 - FAISS vector search for similarity lookup
-- Full RAG pipeline
+- Full RAG pipeline with **token safety checks**
+- **Comprehensive logging** for debugging
+- **Configurable via environment variables** (NOTES_DIR, INDEX_PATH)
 - FastAPI endpoint `/ask?q=...`
+- Persistent index storage (auto-load on startup)
 
 ---
 
@@ -35,19 +39,23 @@ Perfect for exam preparation and personalized studying.
 
 ```
 ai-study-assistant/
-├─ app.py
+├─ app.py                    # FastAPI app with env var config
 ├─ requirements.txt
 ├─ data/
-│  └─ notes/COMP2123/
+│  ├─ notes/COMP2123/       # Your notes go here
+│  └─ index/                # Persisted FAISS indices
 ├─ rag/
-│  ├─ loader.py
-│  ├─ chunker.py
-│  ├─ embedder.py
-│  ├─ vectorstore.py
-│  ├─ prompt.py
-│  └─ qa.py
-└─ api/
-   └─ ask.py
+│  ├─ loader.py             # Load & clean files
+│  ├─ chunker.py            # Split text into chunks
+│  ├─ embedder.py           # Embedding model wrapper
+│  ├─ vectorstore.py        # FAISS with save/load
+│  ├─ prompt.py             # Prompt builder
+│  ├─ qa.py                 # RAG pipeline & QA
+│  └─ token_manager.py      # Token counting & truncation
+├─ api/
+│  └─ ask.py                # /ask endpoint
+└─ scripts/
+   └─ manage_index.py       # CLI for index management
 ```
 
 ---
@@ -82,6 +90,8 @@ Place files under:
 data/notes/COMP2123/
 ```
 
+(Or change `NOTES_DIR` environment variable to use a different folder)
+
 ### 4. Build FAISS index (optional)
 
 ```bash
@@ -91,7 +101,11 @@ PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build
 ### 5. Run API
 
 ```bash
+# Default configuration
 uvicorn app:app --reload
+
+# Or with custom paths:
+NOTES_DIR=data/notes/YOUR_COURSE INDEX_PATH=data/index/your_course uvicorn app:app --reload
 ```
 
 Query:
@@ -99,6 +113,16 @@ Query:
 ```
 http://127.0.0.1:8000/ask?q=your+question
 ```
+
+---
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NOTES_DIR` | `data/notes/COMP2123` | Path to folder containing your notes |
+| `INDEX_PATH` | `data/index/comp2123` | Path prefix for persisted FAISS index |
+| `OPENAI_API_KEY` | (required) | Your OpenAI API key |
 
 ---
 
@@ -110,6 +134,11 @@ http://127.0.0.1:8000/ask?q=your+question
 PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py build
 ```
 
+Options:
+- `--notes <path>` — notes folder (default: data/notes/COMP2123)
+- `--index-path <path>` — index path prefix (default: data/index/comp2123)
+- `--force` — delete existing files before rebuilding
+
 ### Load index
 
 ```bash
@@ -118,6 +147,108 @@ PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py load
 
 ### Status
 
+```bash
+PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py status
+```
+
+---
+
+## Recent Improvements (v0.2)
+
+✨ **Environment Variable Configuration**: Set `NOTES_DIR` and `INDEX_PATH` without editing code.
+
+📊 **Comprehensive Logging**: Detailed INFO/DEBUG/ERROR logs at every step for troubleshooting.
+
+🛡️ **Token Safety**: Automatic detection and truncation of large prompts to prevent API errors.
+
+---
+
+## Architecture
+
+### RAG Pipeline
+
+1. **Loader** (`rag/loader.py`)
+   - Reads .pdf, .md, .txt files
+   - Cleans and normalizes text
+
+2. **Chunker** (`rag/chunker.py`)
+   - Splits text into 500-word chunks with 50-word overlap
+
+3. **Embedder** (`rag/embedder.py`)
+   - Uses sentence-transformers to generate embeddings
+
+4. **VectorStore** (`rag/vectorstore.py`)
+   - Stores vectors in FAISS IndexFlatL2
+   - Persists to disk via faiss.write_index + pickle
+
+5. **QA** (`rag/qa.py`)
+   - Encodes user question
+   - Retrieves top-3 similar chunks
+   - **Checks token safety** before sending to LLM
+   - Builds prompt from chunks + question
+   - Calls OpenAI Chat Completions
+
+6. **Token Manager** (`rag/token_manager.py`)
+   - Estimates token count (1 token ≈ 4 characters)
+   - Truncates chunks to fit API limits
+   - Prevents token overflow errors
+
+---
+
+## Configuration
+
+### Logging Levels
+
+Default is `INFO`. To see more details, set:
+
+```bash
+export PYTHONPATH=/workspaces/ai-study-assistant
+python3 app.py  # Will show INFO logs
+```
+
+Or modify `rag/qa.py` and `app.py` to change `level=logging.INFO` to `level=logging.DEBUG`.
+
+### Token Limits
+
+Current settings in `rag/token_manager.py`:
+- Model: `gpt-4o-mini` (128K context window)
+- Context limit: 120K tokens (reserved 8K for response)
+- Safe chunk truncation: 15K tokens if prompt exceeds limit
+
+---
+
+## Security & Notes
+
+- **Never commit your API keys.** Use environment variables only.
+- Large files (venv/, .pkl, .index) are in `.gitignore`.
+- Index files are persisted but not tracked in git.
+
+---
+
+## Contributing
+
+Contributions welcome! Please:
+
+1. Test locally before opening a PR
+2. Update README for new features
+3. Follow existing code style (logging, error handling)
+
+---
+
+## License
+
+MIT License
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| "Knowledge base is not initialized" | Run `scripts/manage_index.py build` first |
+| "OpenAI auth failed" | Check `OPENAI_API_KEY` environment variable |
+| "No chunks found" | Ensure `.pdf`, `.md`, `.txt` files are in `NOTES_DIR` |
+| Token overflow | Automatic truncation is enabled; check logs for warnings |
 ```bash
 PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py status
 ```
