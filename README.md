@@ -1,0 +1,96 @@
+# ai-study-assistant
+# 🧠 AI Study Assistant
+A personalized AI-powered study assistant that learns from your course notes and answers your questions using Retrieval-Augmented Generation (RAG).
+
+### 🚀 Why This Project?
+Unlike general chatbots, this tool answers **specifically based on your own lecture notes**, tutorials, and study materials.  
+Perfect for consolidating knowledge, preparing for exams, and generating personalized explanations.
+
+---
+
+# ✨ Features (MVP)
+- 📘 Load your own course notes (TXT/MD)
+- ✂️ Automatically chunk text into semantic units
+- 🧩 Generate embeddings using `sentence-transformers`
+- 🔎 Search relevant chunks via FAISS similarity search
+- 💬 Ask any question and get an answer grounded in your notes
+- 🌐 FastAPI backend with a simple `/ask?q=...` endpoint
+
+---
+
+# 📁 Project Structure
+
+ai-study-assistant/
+│ app.py
+│ config.py
+│ requirements.txt
+│
+├── data/
+│ └── notes/ # Place your course notes here
+│
+├── rag/
+│ ├── loader.py # Load and clean text files
+│ ├── chunker.py # Split text into chunks
+│ ├── embedder.py # Embedding model wrapper
+│ ├── vectorstore.py # FAISS index + search
+│ ├── prompt.py # Prompt template for LLM
+│ └── qa.py # Full RAG pipeline
+│
+└── api/
+└── ask.py # /ask endpoint using FastAPI
+
+
+# 🧪 Quick Start
+
+### 1️⃣ Create virtual environment
+```bash
+python3 -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
+2️⃣ Install dependencies
+```bash
+pip install -r requirements.txt
+3️⃣ Add your notes
+Place .txt or .md files inside:
+```bash
+data/notes/
+4️⃣ Run the API
+uvicorn app:app --reload
+Open your browser:
+http://127.0.0.1:8000/ask?q=what+is+polymorphism
+🧠 Example Use Cases
+Generate explanations for complex concepts
+Review course material
+Prepare exam summaries
+Create personalized practice questions
+Build your own AI tutor
+
+🛣️ Roadmap (Planned Features)
+🔹 Phase 1 — MVP (current)
+Basic RAG pipeline working
+
+Simple web API
+
+🔹 Phase 2 — Advanced RAG
+PDF → text support
+
+Better chunking strategies
+
+Multiple courses indexing
+
+🔹 Phase 3 — Frontend UI
+Web dashboard
+
+Chat-like interface
+
+🔹 Phase 4 — Smart Extensions
+Auto-generate quizzes
+
+Auto-summarize notes
+
+Memory + study schedule suggestions
+
+🤝 Contributing
+Currently a personal learning project, but PRs and suggestions are welcome.
+
+📄 License
+MIT License
