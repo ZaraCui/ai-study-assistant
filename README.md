@@ -130,6 +130,24 @@ http://127.0.0.1:8000/ask?q=your+question
 
 ---
 
+## Testing
+
+Run unit tests locally:
+
+```bash
+export PYTHONPATH=.
+pytest -q
+```
+
+Install development tools:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+CI: A GitHub Actions workflow `ci.yml` runs tests and lint on push/PR.
+
+
 ## Index Management CLI
 
 ### Build index
