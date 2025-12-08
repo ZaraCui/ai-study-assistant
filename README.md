@@ -132,7 +132,14 @@ http://127.0.0.1:8000/ask?q=your+question
 
 ## Testing
 
-Run unit tests locally:
+Recommended (CI-friendly): install the package into the environment so tests import the package naturally:
+
+```bash
+python -m pip install -e .
+pytest -q
+```
+
+Alternatively, to run tests without installing, you can set `PYTHONPATH` (less preferred):
 
 ```bash
 export PYTHONPATH=.
@@ -145,7 +152,7 @@ Install development tools:
 pip install -r requirements-dev.txt
 ```
 
-CI: A GitHub Actions workflow `ci.yml` runs tests and lint on push/PR.
+CI: Ensure your workflow runs `python -m pip install -e .` (or `pip install -e .`) before running `pytest`.
 
 
 ## Index Management CLI
