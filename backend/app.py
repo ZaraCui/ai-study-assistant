@@ -1,8 +1,9 @@
 import os
 import logging
 from fastapi import FastAPI
-from api.ask import router as ask_router
-from rag.qa import build_knowledge_base_from_dir
+
+from backend.api.ask import router as ask_router
+from backend.rag.qa import build_knowledge_base_from_dir
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -28,7 +29,6 @@ def startup_event():
         build_knowledge_base_from_dir(notes_dir, index_path)
         logger.info("✓ Knowledge base initialized successfully.")
     except Exception as e:
-        # Do not crash the server if something goes wrong, just log it.
         logger.error(f"✗ Failed to build knowledge base: {e}", exc_info=True)
         logger.warning(
             "Server will continue running but /ask endpoint will not be functional."
