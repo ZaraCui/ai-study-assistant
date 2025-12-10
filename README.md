@@ -204,14 +204,6 @@ PYTHONPATH=/workspaces/ai-study-assistant python3 scripts/manage_index.py status
 
 💾 **Smart Caching**: Lazy-load course indexes on first query, automatic in-memory caching.
 
-## Previous Improvements (v0.2)
-
-✨ **Environment Variable Configuration**: Set `NOTES_DIR` and `INDEX_PATH` without editing code.
-
-📊 **Comprehensive Logging**: Detailed INFO/DEBUG/ERROR logs at every step for troubleshooting.
-
-🛡️ **Token Safety**: Automatic detection and truncation of large prompts to prevent API errors.
----
 
 ## Architecture
 
@@ -264,15 +256,6 @@ Current settings in `rag/token_manager.py`:
 - Model: `gpt-4o-mini` (128K context window)
 - Context limit: 120K tokens (reserved 8K for response)
 - Safe chunk truncation: 15K tokens if prompt exceeds limit
-
----
-
-## Security & Notes
-
-- **Never commit your API keys.** Use environment variables only.
-- Large files (venv/, .pkl, .index) are in `.gitignore`.
-- Index files are persisted but not tracked in git.
-
 ---
 
 ## Contributing
@@ -282,12 +265,6 @@ Contributions welcome! Please:
 1. Test locally before opening a PR
 2. Update README for new features
 3. Follow existing code style (logging, error handling)
-
----
-
-## License
-
-MIT License
 
 ---
 
@@ -314,6 +291,8 @@ export OPENAI_API_KEY="sk-..."
 ```
 
 Do not commit keys or index files.
+
+- Large files (venv/, .pkl, .index) are in `.gitignore`.
 
 ---
 
