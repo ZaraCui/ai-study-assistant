@@ -1,5 +1,15 @@
+import os
+import sys
 from fastapi import APIRouter, Query
 from typing import Optional
+
+# Ensure we can import backend modules
+current_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.dirname(current_dir)
+parent_dir = os.path.dirname(backend_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
 from backend.rag.qa import answer_question, build_knowledge_base_from_dir
 from backend.rag.course_manager import (
     list_available_courses,

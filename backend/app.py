@@ -1,6 +1,14 @@
 import os
+import sys
 import logging
 from fastapi import FastAPI
+
+# Ensure the parent directory is in the path so we can import backend
+# This handles both cases: running from project root or from backend directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 from backend.api.ask import router as ask_router
 from backend.rag.qa import build_knowledge_base_from_dir
