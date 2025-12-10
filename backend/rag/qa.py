@@ -32,6 +32,13 @@ store = None  # will be initialized after building knowledge base
 # Default path prefix (for backward compatibility with old startup code)
 DEFAULT_INDEX_PATH = os.getenv("INDEX_PATH", None)
 
+# Ensure absolute path to avoid issues on Render
+def ensure_abs(path_prefix: str) -> str:
+    """
+    Converts relative paths to absolute paths for Render compatibility
+    """
+    return os.path.abspath(path_prefix)
+
 
 def build_knowledge_base_from_dir(
     folder_path: str, index_path: str = None, course_code: str = None
@@ -63,6 +70,9 @@ def build_knowledge_base_from_dir(
     logger.info(f"Initializing knowledge base for course {course_code_upper}")
     logger.info(f"Notes directory: {folder_path}")
     logger.info(f"Index path: {index_path}")
+
+    # Ensure absolute path for the index
+    index_path = ensure_abs(index_path)
 
     # Try to load existing persisted index first
     try:
@@ -140,103 +150,3 @@ def build_knowledge_base_from_dir(
 
     logger.info("Knowledge base initialization complete.")
     return vs
-
-
-def answer_question(question: str, course_code: str = None) -> str:
-    """
-    Run RAG-style QA for a specific course:
-      1) select or load the course's knowledge base
-      2) embed question
-      3) search similar chunks
-      4) truncate chunks if necessary to fit token limit
-      5) build prompt
-      6) check token safety
-      7) ask OpenAI
-
-    Args:
-        question: The user's question.
-        course_code: Which course to query. If None, uses DEFAULT_COURSE.
-
-    Returns:
-        Answer string or error message.
-    """
-    # Default to DEFAULT_COURSE if not specified
-    if course_code is None:
-        course_code = DEFAULT_COURSE
-
-    course_code_upper = course_code.upper()
-    logger.info(f"Answering question for course: {course_code_upper}")
-    logger.debug(f"Question: {question}")
-
-    # Try to get the store from cache, or load it
-    course_store = get_course_store(course_code_upper)
-
-    if course_store is None:
-        logger.info(f"Course {course_code_upper} not in memory. Attempting to load...")
-        course_store = load_course_store(course_code_upper)
-
-    if course_store is None:
-        error_msg = f"Knowledge base for course {course_code_upper} is not initialized."
-        logger.error(error_msg)
-        notes_path = get_course_notes_path(course_code)
-        cmd = "scripts/manage_index.py build --notes"
-        msg = f"Error: {error_msg} Please run: {cmd} {notes_path}"
-        return msg
-
-    try:
-        logger.debug("Encoding question...")
-        q_vec = embed_texts([question])[0]
-
-        logger.debug("Searching for similar chunks...")
-        context_chunks = course_store.search(q_vec, top_k=3)
-        logger.info(f"Found {len(context_chunks)} relevant chunks.")
-
-        # Token safety: truncate chunks if they would exceed token limit
-        model_name = "gpt-4o-mini"
-        max_context_tokens = 120000  # Conservative limit (gpt-4o-mini has 128k)
-        safe_chunks = truncate_chunks_by_tokens(context_chunks, max_context_tokens)
-
-        if len(safe_chunks) < len(context_chunks):
-            n_context = len(context_chunks)
-            n_safe = len(safe_chunks)
-            logger.warning(
-                f"Truncated context from {n_context} chunks to {n_safe} "
-                f"to fit within token limit."
-            )
-
-        logger.debug("Building prompt...")
-        prompt = build_prompt(question, safe_chunks)
-
-        # Check if prompt is safe before sending to API
-        is_safe, token_info = is_prompt_safe(prompt, model_name)
-        logger.info(
-            f"Prompt token estimate: {token_info['estimated_tokens']} / "
-            f"{token_info['available_tokens']} available tokens"
-        )
-
-        if not is_safe:
-            msg = "Prompt may exceed token limit. Attempting to truncate further..."
-            logger.warning(msg)
-            safe_chunks = truncate_chunks_by_tokens(safe_chunks, 15000)
-            prompt = build_prompt(question, safe_chunks)
-
-        logger.info(f"Calling OpenAI API for course {course_code_upper}...")
-        resp = openai.chat.completions.create(
-            model=model_name, messages=[{"role": "user", "content": prompt}]
-        )
-        answer = resp.choices[0].message.content
-        logger.info("Answer generated successfully.")
-        return answer
-
-    except openai.AuthenticationError as e:
-        logger.error(f"OpenAI authentication failed. Check your OPENAI_API_KEY: {e}")
-        return "Error: Authentication failed. Please check your OpenAI API key."
-    except openai.RateLimitError as e:
-        logger.error(f"OpenAI rate limit exceeded: {e}")
-        return "Error: Too many requests to OpenAI. Please try again later."
-    except openai.APIError as e:
-        logger.error(f"OpenAI API error: {e}")
-        return "Error: OpenAI API error. Please try again."
-    except Exception as e:
-        logger.error(f"Unexpected error in answer_question: {e}", exc_info=True)
-        return f"Error: {str(e)}"
