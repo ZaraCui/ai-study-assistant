@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import Optional
-from rag.qa import answer_question
+from backend.rag.qa import answer_question
 from rag.course_manager import (
     list_available_courses,
     get_course_info,
