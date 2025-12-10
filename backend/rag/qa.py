@@ -44,4 +44,28 @@ def get_vectorstore(notes_path: str, index_path: str) -> VectorStore:
 # ONLY search, NO embedding, NO LLM
 # -------------------------------------------------------
 def answer_question(question: str, course: str = None):
-    notes_dir = os.getenv("NOTES_DIR", "backend/data/notes/C
+    notes_dir = os.getenv("NOTES_DIR", "backend/data/notes/COMP2123")
+    index_dir = os.getenv("INDEX_PATH", "backend/data/index/comp2123")
+
+    vs = get_vectorstore(notes_dir, index_dir)
+
+    results = vs.search(question, top_k=5)
+
+    response_text = "\n\n".join([r["text"] for r in results])
+    return response_text
+
+
+# -------------------------------------------------------
+# On startup, only load index
+# -------------------------------------------------------
+def build_knowledge_base_from_dir(notes_path: str, index_path: str):
+    logger.info("Attempting to load persisted index...")
+
+    try:
+        _ = load_persisted_vectorstore(index_path)
+        logger.info("Successfully loaded precomputed index.")
+    except Exception as e:
+        logger.error(f"Failed loading persisted index: {e}")
+        raise
+
+    return True
