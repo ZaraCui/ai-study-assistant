@@ -1,8 +1,8 @@
 import os
 from types import SimpleNamespace
 
-from rag.qa import build_knowledge_base_from_dir, answer_question
-import rag.embedder as embedder
+from backend.rag.qa import build_knowledge_base_from_dir, answer_question
+import backend.rag.embedder as embedder
 
 
 def test_build_and_query_integration(tmp_path, monkeypatch):
@@ -21,7 +21,7 @@ def test_build_and_query_integration(tmp_path, monkeypatch):
     monkeypatch.setattr(embedder, "get_model", lambda: DummyModel())
 
     # Monkeypatch openai completion to avoid network calls
-    import rag.qa as qa_module
+    import backend.rag.qa as qa_module
 
     def fake_create(*args, **kwargs):
         return SimpleNamespace(

@@ -1,4 +1,4 @@
-from rag.token_manager import estimate_tokens, truncate_chunks_by_tokens
+from backend.rag.token_manager import estimate_tokens, truncate_chunks_by_tokens
 
 
 def test_estimate_tokens_basic():

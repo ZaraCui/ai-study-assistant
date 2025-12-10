@@ -18,8 +18,8 @@ import argparse
 import os
 import sys
 
-from rag.qa import build_knowledge_base_from_dir
-from rag.course_manager import (
+from backend.rag.qa import build_knowledge_base_from_dir
+from backend.rag.course_manager import (
     get_course_notes_path,
     get_course_index_path,
     is_course_indexed,
@@ -27,7 +27,7 @@ from rag.course_manager import (
     get_course_info,
     DEFAULT_COURSE,
 )
-from rag.vectorstore import VectorStore
+from backend.rag.vectorstore import VectorStore
 
 
 def remove_index_files(path_prefix: str):

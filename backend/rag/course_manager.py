@@ -7,7 +7,7 @@ import os
 import logging
 from typing import Optional, Dict, List
 
-from rag.vectorstore import VectorStore
+from backend.rag.vectorstore import VectorStore
 
 logger = logging.getLogger(__name__)
 

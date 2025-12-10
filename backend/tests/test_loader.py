@@ -1,4 +1,4 @@
-from rag.loader import load_texts
+from backend.rag.loader import load_texts
 
 
 def test_load_texts_reads_txt_files(tmp_path, monkeypatch):

@@ -2,13 +2,13 @@ import os
 import logging
 import openai
 
-from rag.embedder import embed_texts
-from rag.vectorstore import VectorStore
-from rag.prompt import build_prompt
-from rag.loader import load_texts
-from rag.chunker import chunk_text
-from rag.token_manager import truncate_chunks_by_tokens, is_prompt_safe
-from rag.course_manager import (
+from backend.rag.embedder import embed_texts
+from backend.rag.vectorstore import VectorStore
+from backend.rag.prompt import build_prompt
+from backend.rag.loader import load_texts
+from backend.rag.chunker import chunk_text
+from backend.rag.token_manager import truncate_chunks_by_tokens, is_prompt_safe
+from backend.rag.course_manager import (
     get_course_store,
     set_course_store,
     load_course_store,

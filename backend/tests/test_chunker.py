@@ -1,4 +1,4 @@
-from rag.chunker import chunk_text
+from backend.rag.chunker import chunk_text
 
 
 def test_chunker_overlap_and_sizes():
