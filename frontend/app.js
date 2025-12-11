@@ -11,7 +11,7 @@ async function ask() {
     box.innerText = "Loading...";
 
     try {
-        const response = await fetch("https://YOUR_BACKEND_URL/ask", {
+        const response = await fetch("https://ai-study-assistant-5xa4.onrender.com/ask", { // my Render backend API URL
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
