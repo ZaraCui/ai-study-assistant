@@ -12,3 +12,4 @@ app = "backend.app:app"
 [tool.poetry.dependencies]
 fastapi = "^0.68.0"
 uvicorn = "^0.15.0"
+python = "^3.12"

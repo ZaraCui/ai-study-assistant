@@ -1,13 +1,14 @@
 import os
 import sys
 import logging
-from fastapi import FastAPI # type: ignore
+from fastapi import FastAPI  # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
 
 # -------------------------------------------------------------------
 # Fix Python path so "backend" module is importable on Render
 # -------------------------------------------------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))          # backend/
-PROJECT_ROOT = os.path.dirname(BASE_DIR)                      # project root
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # backend/
+PROJECT_ROOT = os.path.dirname(BASE_DIR)  # project root
 
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
@@ -32,6 +33,19 @@ logging.basicConfig(
 # FastAPI App
 # -------------------------------------------------------------------
 app = FastAPI()
+
+# -------------------------------------------------------------------
+# CORS Middleware Configuration
+# -------------------------------------------------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有源访问
+    allow_credentials=True,
+    allow_methods=["*"],  # 允许所有 HTTP 方法
+    allow_headers=["*"],  # 允许所有 HTTP 头
+)
+
+# Add your routes here
 app.include_router(ask_router)
 
 
