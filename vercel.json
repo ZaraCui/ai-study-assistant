@@ -18,5 +18,11 @@
     "NOTES_DIR": "backend/data/notes/COMP2123",
     "INDEX_PATH": "backend/data/index/comp2123",
     "DEFAULT_COURSE": "COMP2123"
-  }
+  },
+  "routes": [
+    {
+      "src": "/.*",
+      "dest": "backend/app.py"
+    }
+  ]
 }
