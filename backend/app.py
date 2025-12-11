@@ -43,21 +43,28 @@ def startup_event():
     """
     Load COMP2123 knowledge base at startup using:
     - Environment variables if provided
-    - Otherwise stable absolute paths (backend/data/...)
+    - Otherwise stable absolute paths (backend/data/... in Render)
     """
 
     # Absolute fallback paths (Render-safe)
     default_notes = os.path.join(BASE_DIR, "data/notes/COMP2123")
     default_index = os.path.join(BASE_DIR, "data/index/comp2123")
 
+    # Log the absolute paths being used for notes and index files
+    logger.info(f"Default notes path: {default_notes}")
+    logger.info(f"Default index path: {default_index}")
+
+    # Try loading from environment variables if set
     notes_dir = os.getenv("NOTES_DIR", default_notes)
     index_path = os.getenv("INDEX_PATH", default_index)
 
-    logger.info("=== AI Study Assistant Startup ===")
-    logger.info(f"Notes directory: {notes_dir}")
-    logger.info(f"Index path: {index_path}")
+    # Log the environment variable values
+    logger.info(f"Loading notes from: {notes_dir}")
+    logger.info(f"Loading index from: {index_path}")
 
     try:
+        # Attempt to build the knowledge base from the provided paths
+        logger.info("=== AI Study Assistant Startup ===")
         build_knowledge_base_from_dir(notes_dir, index_path)
         logger.info("✓ Knowledge base initialized successfully.")
     except Exception as e:
