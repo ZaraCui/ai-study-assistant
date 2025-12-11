@@ -17,6 +17,6 @@
     "OPENAI_API_KEY": "your-api-key",
     "NOTES_DIR": "backend/data/notes/COMP2123",
     "INDEX_PATH": "backend/data/index/comp2123",
-    "DEFAULT_COURSE": "COMP2123",
+    "DEFAULT_COURSE": "COMP2123"
   }
 }
