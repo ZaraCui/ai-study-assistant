@@ -17,6 +17,5 @@
     "OPENAI_API_KEY": "your-api-key",
     "NOTES_DIR": "backend/data/notes/COMP2123",
     "INDEX_PATH": "backend/data/index/comp2123"
-  },
-  "python": "3.9" 
+  }
 }
