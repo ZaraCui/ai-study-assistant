@@ -1,7 +1,7 @@
 import os
 import logging
 from functools import lru_cache
-import fitz  # PyMuPDF
+import fitz  # type: ignore
 
 from .vectorstore import VectorStore
 from .loader import load_texts
@@ -62,13 +62,12 @@ def build_knowledge_base_from_dir(notes_path: str, index_path: str):
     logger.info("Attempting to load persisted index...")
 
     try:
-        _ = load_persisted_vectorstore(index_path)
+        vs = load_persisted_vectorstore(index_path)
         logger.info("Successfully loaded precomputed index.")
     except Exception as e:
         logger.error(f"Failed loading persisted index: {e}")
         raise
 
-    # 如果没有找到已存在的索引，尝试加载 PDF 文件并创建新的索引
     try:
         # 遍历目录，加载所有 PDF 文件
         pdf_files = [f for f in os.listdir(notes_path) if f.endswith(".pdf")]
@@ -83,13 +82,14 @@ def build_knowledge_base_from_dir(notes_path: str, index_path: str):
                 page = doc.load_page(page_num)
                 full_text += page.get_text("text")  # 获取页面的文本内容
 
-            # 将读取的 PDF 文本添加到索引中（假设有 add_to_index 方法）
+            # 将读取的 PDF 文本添加到索引中
             logger.info(f"Extracted text from {pdf_file}")
-            # 您可以将文本添加到现有的索引或数据库中，按需修改
-            # add_to_index(full_text)
+            # 假设你有一个 add_to_index 方法来将文本添加到索引
+            vs.add([full_text], [pdf_file])
 
     except Exception as e:
         logger.error(f"Failed processing PDF files: {e}")
         raise
 
     return True
+
