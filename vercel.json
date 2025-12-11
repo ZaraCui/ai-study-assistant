@@ -2,15 +2,20 @@
   "version": 2,
   "builds": [
     {
+      "src": "backend/requirements.txt",
+      "use": "@vercel/python"
+    },
+    {
       "src": "backend/app.py",
       "use": "@vercel/python",
-      "config": { "maxDuration": 10 }
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "backend/app.py"
-    }
-  ]
+  "env": {
+    "OPENAI_API_KEY": "",  // Removed the actual API key
+    "NOTES_DIR": "backend/data/notes/COMP2123",
+    "INDEX_PATH": "backend/data/index/comp2123"
+  }
 }
