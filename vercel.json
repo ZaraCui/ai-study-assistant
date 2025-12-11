@@ -15,8 +15,8 @@
   ],
   "env": {
     "OPENAI_API_KEY": "your-api-key",
-    "NOTES_DIR": "backend/data/notes/COMP2123",
-    "INDEX_PATH": "backend/data/index/comp2123",
+    "NOTES_DIR": "/opt/render/project/src/backend/data/index/comp2123.index",
+    "INDEX_PATH": "/opt/render/project/src/backend/data/notes/COMP2123",
     "DEFAULT_COURSE": "COMP2123"
   },
   "routes": [
