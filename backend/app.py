@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI # type: ignore
 
 # -------------------------------------------------------------------
 # Fix Python path so "backend" module is importable on Render
