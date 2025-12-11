@@ -2,7 +2,9 @@ import faiss  # type: ignore
 import numpy as np
 import pickle
 import os
+import logging
 
+logger = logging.getLogger(__name__)
 
 def ensure_abs(path_prefix: str) -> str:
     """
@@ -10,7 +12,6 @@ def ensure_abs(path_prefix: str) -> str:
     自动把相对路径变成绝对路径，避免部署环境找不到文件。
     """
     return os.path.abspath(path_prefix)
-
 
 class VectorStore:
     """
@@ -26,7 +27,8 @@ class VectorStore:
             self.index = index
             try:
                 dim = index.d  # 如果已加载FAISS索引，则使用已加载的维度
-            except Exception:
+            except Exception as e:
+                logger.error(f"Error extracting dim from index: {e}")
                 pass
         else:
             if dim is None:
@@ -73,8 +75,8 @@ class VectorStore:
         with open(texts_file, "wb") as f:
             pickle.dump(self.texts, f)
 
-        print(f"[VectorStore] Saved index to {index_file}")
-        print(f"[VectorStore] Saved texts to {texts_file}")
+        logger.info(f"[VectorStore] Saved index to {index_file}")
+        logger.info(f"[VectorStore] Saved texts to {texts_file}")
 
     @classmethod
     def load(cls, path_prefix: str):
@@ -86,8 +88,8 @@ class VectorStore:
         index_file = f"{path_prefix}.index"
         texts_file = f"{path_prefix}_texts.pkl"
 
-        print(f"[VectorStore] Attempting to load index at: {index_file}")
-        print(f"[VectorStore] Attempting to load texts at: {texts_file}")
+        logger.info(f"[VectorStore] Attempting to load index at: {index_file}")
+        logger.info(f"[VectorStore] Attempting to load texts at: {texts_file}")
 
         if not os.path.exists(index_file) or not os.path.exists(texts_file):
             raise FileNotFoundError(f"Index or texts file not found at: {path_prefix}")
@@ -99,10 +101,14 @@ class VectorStore:
 
         try:
             dim = index.d
-        except Exception:
+        except Exception as e:
+            logger.error(f"Failed to get dimension from index: {e}")
             dim = None
 
-        print(f"[VectorStore] Successfully loaded FAISS index (dim={dim})")
-        print(f"[VectorStore] Loaded {len(texts)} text chunks")
+        if dim is None:
+            logger.warning("FAISS index dimension is None, please check the index file")
+
+        logger.info(f"[VectorStore] Successfully loaded FAISS index (dim={dim})")
+        logger.info(f"[VectorStore] Loaded {len(texts)} text chunks")
 
         return cls(dim=dim, index=index, texts=texts)
