@@ -29,7 +29,7 @@ class VectorStore:
                 dim = index.d  # 如果已加载FAISS索引，则使用已加载的维度
             except Exception as e:
                 logger.error(f"Error extracting dim from index: {e}")
-                pass
+                dim = None
         else:
             if dim is None:
                 raise ValueError("Either 'dim' or 'index' must be provided")
@@ -94,7 +94,11 @@ class VectorStore:
         if not os.path.exists(index_file) or not os.path.exists(texts_file):
             raise FileNotFoundError(f"Index or texts file not found at: {path_prefix}")
 
-        index = faiss.read_index(index_file)
+        try:
+            index = faiss.read_index(index_file)
+        except Exception as e:
+            logger.error(f"Error loading FAISS index: {e}")
+            raise
 
         with open(texts_file, "rb") as f:
             texts = pickle.load(f)
