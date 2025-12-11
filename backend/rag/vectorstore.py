@@ -25,22 +25,32 @@ class VectorStore:
         if index is not None:
             self.index = index
             try:
-                dim = index.d
+                dim = index.d  # 如果已加载FAISS索引，则使用已加载的维度
             except Exception:
                 pass
         else:
             if dim is None:
                 raise ValueError("Either 'dim' or 'index' must be provided")
-            self.index = faiss.IndexFlatL2(dim)
+            if not isinstance(dim, int) or dim <= 0:
+                raise ValueError("The 'dim' parameter must be a positive integer")
+            self.index = faiss.IndexFlatL2(dim)  # 创建 FAISS 索引
 
         self.texts = texts or []
 
     def add(self, vectors, chunks):
+        """
+        Add vectors and their associated text chunks to the vector store.
+        """
+        if len(vectors) == 0 or len(vectors[0]) != self.index.d:
+            raise ValueError(f"Vector dimension mismatch. Expected {self.index.d}, got {len(vectors[0])}")
         vectors = np.array(vectors).astype("float32")
         self.index.add(vectors)
         self.texts.extend(chunks)
 
     def search(self, query_vector, top_k=3):
+        """
+        Perform a search for the top_k most similar vectors to the query.
+        """
         query_vector = np.array([query_vector]).astype("float32")
         _, indices = self.index.search(query_vector, top_k)
         return [

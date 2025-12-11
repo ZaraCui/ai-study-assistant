@@ -1,6 +1,6 @@
 import os
 import re
-import fitz  # PyMuPDF
+import fitz  # type: ignore
 
 
 def _clean_pdf_text(text: str) -> str:
