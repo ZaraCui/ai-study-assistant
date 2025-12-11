@@ -3,6 +3,8 @@ import sys
 import logging
 from fastapi import FastAPI  # type: ignore
 from fastapi.middleware.cors import CORSMiddleware # type: ignore
+from dotenv import load_dotenv # type: ignore
+load_dotenv()  # 加载环境变量
 
 # -------------------------------------------------------------------
 # Fix Python path so "backend" module is importable on Render
