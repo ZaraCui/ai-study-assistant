@@ -3,6 +3,8 @@ import sys
 from fastapi import APIRouter, Query
 from typing import Optional
 
+DEFAULT_COURSE = os.getenv("DEFAULT_COURSE", "COMP2123")  # default:"COMP2123"
+
 # Ensure we can import backend modules
 current_dir = os.path.dirname(os.path.abspath(__file__))
 backend_dir = os.path.dirname(current_dir)
