@@ -40,11 +40,12 @@ def load_texts(folder_path: str):
         full_path = os.path.join(folder_path, filename)
         if not os.path.isfile(full_path):
             continue
-
+        print(f"Processing file: {filename}")  # Debug log
         if filename.lower().endswith(".pdf"):
             text = pdf_to_text(full_path)
             texts.append(text)
         elif filename.endswith(".txt") or filename.endswith(".md"):
             with open(full_path, "r", encoding="utf-8") as f:
                 texts.append(f.read())
+    print(f"Loaded {len(texts)} files.")  # Debug log
     return texts
