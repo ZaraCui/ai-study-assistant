@@ -24,8 +24,5 @@ build/
 .env
 .env.local
 
-# Data files (optional)
-data/index/
-
 # PDFs - keep these if you want to version them, otherwise ignore
 #*.pdf
